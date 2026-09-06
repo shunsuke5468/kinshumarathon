@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>しらふ手帳</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1C2733">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="しらふ手帳">
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+
+  :root{
+    --bg:#EEF2F5;
+    --surface:#FFFFFF;
+    --surface-2:#F7F9FA;
+    --ink:#1C2733;
+    --ink-muted:#5C6B7A;
+    --ink-faint:#8B98A5;
+    --line:#DCE3E8;
+    --amber:#B96E12;
+    --amber-soft:#F3E2C8;
+    --teal:#2F6F63;
+    --teal-soft:#DCEAE6;
+    --rose:#A94F68;
+    --rose-soft:#F2DEE3;
+    --blue:#2E5FA3;
+    --blue-soft:#DCE6F5;
+    --good:#2F7D4F;
+    --shadow: 0 1px 2px rgba(28,39,51,.06), 0 8px 24px rgba(28,39,51,.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161C;
+      --surface:#1A2029;
+      --surface-2:#20272F;
+      --ink:#EDEFF2;
+      --ink-muted:#9AA7B3;
+      --ink-faint:#6C7885;
+      --line:#2A323C;
+      --amber:#E0A24A;
+      --amber-soft:#3A2F1C;
+      --teal:#5FAE9D;
+      --teal-soft:#1D302C;
+      --rose:#DD8FA5;
+      --rose-soft:#332128;
+      --blue:#7FA8E0;
+      --blue-soft:#1B2A3D;
+      --good:#5FBE84;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161C;
+    --surface:#1A2029;
+    --surface-2:#20272F;
+    --ink:#EDEFF2;
+    --ink-muted:#9AA7B3;
+    --ink-faint:#6C7885;
+    --line:#2A323C;
+    --amber:#E0A24A;
+    --amber-soft:#3A2F1C;
+    --teal:#5FAE9D;
+    --teal-soft:#1D302C;
+    --rose:#DD8FA5;
+    --rose-soft:#332128;
+    --blue:#7FA8E0;
+    --blue-soft:#1B2A3D;
+    --good:#5FBE84;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:40px 20px 80px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+  }
+
+  header.top{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .eyebrow{
+    font-size:12.5px;
+    letter-spacing:.14em;
+    color:var(--ink-faint);
+    text-transform:uppercase;
+  }
+  .greeting{
+    font-family:'Shippori Mincho', serif;
+    font-size:21px;
+    font-weight:700;
+  }
+  .today{
+    font-size:13px;
+    color:var(--ink-muted);
+  }
+
+  .hero{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow:var(--shadow);
+    padding:36px 28px 28px;
+    overflow:hidden;
+    text-align:center;
+  }
+  .hero-arc{
+    position:absolute;
+    top:-70px; left:50%;
+    transform:translateX(-50%);
+    width:340px; height:340px;
+    pointer-events:none;
+  }
+  .hero-label{
+    font-size:13px;
+    color:var(--ink-muted);
+    position:relative;
+  }
+  .hero-number{
+    position:relative;
+    font-family:'Shippori Mincho', serif;
+    font-weight:800;
+    line-height:1;
+    font-variant-numeric: tabular-nums;
+    font-size:76px;
+    margin:10px 0 2px;
+    color:var(--ink);
+  }
+  .hero-number small{
+    font-size:24px;
+    font-weight:700;
+    margin-left:4px;
+    color:var(--ink-muted);
+  }
+  .hero-sub{
+    position:relative;
+    font-size:14px;
+    color:var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-best{
+    position:relative;
+    margin-top:10px;
+    font-size:12.5px;
+    color:var(--ink-faint);
+  }
+  .hero-countdown .hero-number{ color:var(--amber); }
+
+  .edit-toggle{
+    position:relative;
+    margin-top:18px;
+    display:inline-flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+  }
+  button.link-btn{
+    background:none;
+    border:none;
+    padding:6px 4px;
+    font:inherit;
+    font-size:12.5px;
+    color:var(--ink-muted);
+    text-decoration:underline;
+    text-underline-offset:3px;
+    cursor:pointer;
+  }
+  button.link-btn:hover{ color:var(--ink); }
+  button.link-btn:focus-visible, input:focus-visible, textarea:focus-visible, button:focus-visible{
+    outline:2px solid var(--amber);
+    outline-offset:2px;
+  }
+
+  .edit-panel{
+    position:relative;
+    margin-top:14px;
+    padding-top:16px;
+    border-top:1px dashed var(--line);
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    justify-content:center;
+    align-items:center;
+  }
+  .edit-panel[hidden]{ display:none; }
+  input[type="datetime-local"], input[type="number"]{
+    font:inherit;
+    font-size:14px;
+    padding:8px 10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--surface-2);
+    color:var(--ink);
+  }
+  .btn{
+    font:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    padding:8px 16px;
+    border-radius:10px;
+    border:1px solid transparent;
+    cursor:pointer;
+  }
+  .btn-primary{ background:var(--ink); color:var(--surface); }
+  .btn-primary:hover{ opacity:.88; }
+  .btn-ghost{ background:transparent; border-color:var(--line); color:var(--ink-muted); }
+  .btn-ghost:hover{ color:var(--ink); border-color:var(--ink-faint); }
+
+  .reset-row{
+    position:relative;
+    margin-top:16px;
+  }
+  .confirm-box{
+    position:relative;
+    margin-top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    align-items:center;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    font-size:13px;
+    color:var(--ink-muted);
+  }
+  .confirm-box[hidden]{ display:none; }
+  .confirm-actions{ display:flex; gap:8px; }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  @media (max-width:480px){
+    .stat-grid{ grid-template-columns:1fr; }
+  }
+  .stat{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .stat-icon{ width:22px; height:22px; }
+  .stat-label{
+    font-size:12.5px;
+    color:var(--ink-muted);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .stat-value{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:26px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-value.teal{ color:var(--teal); }
+  .stat-value.amber{ color:var(--amber); }
+  .stat-note{ font-size:12px; color:var(--ink-faint); line-height:1.5; }
+  .amount-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-top:2px;
+  }
+  .amount-row input{ width:96px; }
+  .progress{
+    height:6px;
+    border-radius:99px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    overflow:hidden;
+    margin-top:4px;
+  }
+  .progress > span{
+    display:block;
+    height:100%;
+    background:var(--amber);
+    border-radius:99px 0 0 99px;
+  }
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:22px;
+  }
+  .card h2{
+    font-family:'Shippori Mincho', serif;
+    font-size:16px;
+    font-weight:700;
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .badge-dot{
+    width:8px; height:8px; border-radius:99px; display:inline-block;
+  }
+
+  .benefit-row{
+    display:flex;
+    gap:14px;
+    padding:12px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .benefit-row:last-child{ border-bottom:none; padding-bottom:0; }
+  .benefit-row:first-child{ padding-top:0; }
+  .benefit-tag{
+    flex:0 0 auto;
+    font-size:12px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:99px;
+    height:fit-content;
+    white-space:nowrap;
+  }
+  .benefit-tag.achieved{ background:var(--teal-soft); color:var(--teal); }
+  .benefit-tag.next{ background:var(--amber-soft); color:var(--amber); }
+  .benefit-text{ font-size:13.5px; color:var(--ink-muted); line-height:1.6; }
+  .benefit-text b{ color:var(--ink); font-weight:700; }
+
+  .affirmation{
+    margin-top:16px;
+    padding:16px 18px;
+    background:var(--rose-soft);
+    border-radius:12px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .affirmation p{
+    margin:0;
+    font-size:14px;
+    color:var(--ink);
+    line-height:1.7;
+  }
+  .affirmation svg{ flex:0 0 auto; margin-top:2px; }
+
+  textarea{
+    width:100%;
+    font:inherit;
+    font-size:14px;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--surface-2);
+    color:var(--ink);
+    resize:vertical;
+    min-height:70px;
+    line-height:1.6;
+  }
+  .journal-form{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    align-items:flex-end;
+  }
+  .journal-list{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .journal-item{
+    display:flex;
+    gap:10px;
+    padding:12px 14px;
+    background:var(--surface-2);
+    border-radius:12px;
+    border:1px solid var(--line);
+  }
+  .journal-item .meta{
+    flex:0 0 auto;
+    width:74px;
+    font-size:11.5px;
+    color:var(--ink-faint);
+    line-height:1.5;
+    padding-top:1px;
+  }
+  .journal-item .text{
+    flex:1 1 auto;
+    font-size:13.5px;
+    color:var(--ink);
+    line-height:1.6;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+  }
+  .journal-item button{
+    flex:0 0 auto;
+    background:none;
+    border:none;
+    color:var(--ink-faint);
+    cursor:pointer;
+    font-size:16px;
+    line-height:1;
+    padding:2px;
+  }
+  .journal-item button:hover{ color:var(--rose); }
+  .journal-empty{
+    font-size:13px;
+    color:var(--ink-faint);
+    padding:8px 2px;
+  }
+
+  /* --- marathon section --- */
+  .race-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:14px;
+  }
+  .race-countdown{
+    font-family:'Shippori Mincho', serif;
+    font-weight:800;
+    font-size:34px;
+    color:var(--blue);
+    line-height:1;
+    font-variant-numeric: tabular-nums;
+  }
+  .race-countdown small{
+    font-size:14px;
+    font-weight:700;
+    color:var(--ink-muted);
+    margin-left:3px;
+  }
+  .phase-badge{
+    font-size:12px;
+    font-weight:700;
+    padding:4px 11px;
+    border-radius:99px;
+    background:var(--blue-soft);
+    color:var(--blue);
+    white-space:nowrap;
+  }
+  .goal-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:12.5px;
+    color:var(--ink-muted);
+    margin-bottom:16px;
+    flex-wrap:wrap;
+  }
+  .goal-row input{ width:96px; }
+  .pace-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:18px;
+  }
+  @media (max-width:480px){
+    .pace-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+  .pace-cell{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:10px 8px;
+    text-align:center;
+  }
+  .pace-cell .pl{ font-size:11px; color:var(--ink-faint); }
+  .pace-cell .pv{
+    font-family:'Shippori Mincho', serif;
+    font-weight:700;
+    font-size:15px;
+    font-variant-numeric: tabular-nums;
+    margin-top:2px;
+  }
+  .week-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:13px;
+    color:var(--ink-muted);
+    margin-bottom:10px;
+  }
+  .week-title b{ color:var(--ink); }
+  .session-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .session-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:10px 12px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .session-row.done{ opacity:.55; }
+  .session-row input[type="checkbox"]{
+    margin-top:3px;
+    width:17px; height:17px;
+    accent-color:var(--blue);
+    flex:0 0 auto;
+  }
+  .session-day{
+    flex:0 0 auto;
+    width:28px;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--blue);
+    padding-top:1px;
+  }
+  .session-body{ flex:1 1 auto; }
+  .session-type{ font-size:13.5px; font-weight:700; color:var(--ink); }
+  .session-detail{ font-size:12.5px; color:var(--ink-muted); margin-top:1px; line-height:1.5; }
+  .session-row.done .session-type,
+  .session-row.done .session-detail{ text-decoration:line-through; }
+
+  details.plan-table{ margin-top:18px; }
+  details.plan-table > summary{
+    cursor:pointer;
+    font-size:13px;
+    font-weight:700;
+    color:var(--blue);
+    list-style:none;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  details.plan-table > summary::-webkit-details-marker{ display:none; }
+  details.plan-table > summary::before{
+    content:'▸';
+    font-size:11px;
+    transition:transform .15s ease;
+  }
+  details.plan-table[open] > summary::before{ transform:rotate(90deg); }
+  .plan-table-scroll{
+    overflow-x:auto;
+    margin-top:12px;
+  }
+  table.plan{
+    width:100%;
+    min-width:560px;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+  table.plan th, table.plan td{
+    text-align:left;
+    padding:7px 8px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  table.plan th{
+    color:var(--ink-faint);
+    font-weight:700;
+    font-size:11px;
+  }
+  table.plan td.wk{ font-variant-numeric: tabular-nums; color:var(--ink-muted); }
+  table.plan tr.current-week td{ background:var(--blue-soft); }
+  .tag-phase{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    padding:2px 7px;
+    border-radius:99px;
+    background:var(--blue-soft);
+    color:var(--blue);
+    white-space:nowrap;
+  }
+  .note-line{
+    margin-top:16px;
+    font-size:12px;
+    color:var(--ink-faint);
+    line-height:1.7;
+  }
+
+  footer{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-faint);
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    .hero-arc circle{ animation: breathe 6s ease-in-out infinite; transform-origin:center; }
+    @keyframes breathe{
+      0%,100%{ opacity:.55; }
+      50%{ opacity:1; }
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="eyebrow">しらふ手帳</div>
+    <div class="greeting" id="greeting">こんにちは、ひらきさん</div>
+    <div class="today" id="todayLine"></div>
+  </header>
+
+  <section class="hero" id="hero">
+    <svg class="hero-arc" viewBox="0 0 340 340" aria-hidden="true">
+      <circle cx="170" cy="230" r="150" fill="none" stroke="var(--amber-soft)" stroke-width="2"/>
+      <circle cx="170" cy="230" r="118" fill="none" stroke="var(--amber-soft)" stroke-width="2"/>
+      <circle cx="170" cy="230" r="86" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="4 7" opacity="0.6"/>
+    </svg>
+    <div class="hero-label" id="heroLabel">禁酒をはじめてから</div>
+    <div class="hero-number" id="heroNumber">–</div>
+    <div class="hero-sub" id="heroSub">&nbsp;</div>
+    <div class="hero-best" id="heroBest" hidden></div>
+
+    <div class="edit-toggle">
+      <button class="link-btn" id="toggleEdit" type="button">開始日時を編集する</button>
+    </div>
+    <div class="edit-panel" id="editPanel" hidden>
+      <input type="datetime-local" id="quitStartInput">
+      <button class="btn btn-primary" id="saveStart" type="button">保存</button>
+    </div>
+
+    <div class="reset-row">
+      <button class="link-btn" id="toggleReset" type="button">今日、また一から始める</button>
+    </div>
+    <div class="confirm-box" id="confirmBox" hidden>
+      <div>これまでの日数はいったんリセットされます。自己ベストとして記録は残ります。よろしいですか?</div>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" id="cancelReset" type="button">やめておく</button>
+        <button class="btn btn-primary" id="confirmReset" type="button">リセットする</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="stat-grid">
+    <div class="stat">
+      <div class="stat-label">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.6"><path d="M4 17c3-6 5-8 8-8s5 2 8 8" stroke-linecap="round"/><path d="M4 20h16" stroke-linecap="round"/></svg>
+        節約できた金額
+      </div>
+      <div class="stat-value teal" id="savedValue">–</div>
+      <div class="amount-row">
+        <span class="stat-note">1日あたり</span>
+        <input type="number" id="dailyAmount" placeholder="例: 1500" min="0" inputmode="numeric">
+        <span class="stat-note">円で計算</span>
+      </div>
+      <div class="stat-note" id="savedNote"></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg>
+        次のマイルストーン
+      </div>
+      <div class="stat-value amber" id="milestoneValue">–</div>
+      <div class="stat-note" id="milestoneNote"></div>
+      <div class="progress"><span id="milestoneBar" style="width:0%"></span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge-dot" style="background:var(--teal)"></span>からだの変化</h2>
+    <div id="benefitList"></div>
+    <div class="affirmation">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.8"><path d="M12 21s-7-4.35-9.5-8.5C.7 8.9 2.7 5 6.3 5c2 0 3.4 1.1 4.2 2.3C11.3 6.1 12.7 5 14.7 5c3.6 0 5.6 3.9 3.8 7.5C16 16.65 12 21 12 21Z"/></svg>
+      <p id="affirmationText"></p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge-dot" style="background:var(--rose)"></span>今日のふり返り</h2>
+    <div class="journal-form">
+      <textarea id="journalInput" placeholder="今日の気分、飲みたくなった瞬間、うまくいったことなど、なんでも。"></textarea>
+      <button class="btn btn-primary" id="saveJournal" type="button">記録する</button>
+    </div>
+    <div class="journal-list" id="journalList"></div>
+  </section>
+
+  <section class="card" id="marathonCard">
+    <h2><span class="badge-dot" style="background:var(--blue)"></span>サブ4への道・湘南国際マラソン</h2>
+
+    <div class="race-head">
+      <div>
+        <div class="race-countdown" id="raceCountdown">–</div>
+      </div>
+      <div class="phase-badge" id="phaseBadge">–</div>
+    </div>
+
+    <div class="goal-row">
+      <span>目標タイム</span>
+      <input type="text" id="goalTimeInput" inputmode="numeric" placeholder="3:55:00">
+      <span id="goalPaceNote"></span>
+    </div>
+
+    <div class="pace-grid">
+      <div class="pace-cell"><div class="pl">イージー</div><div class="pv" id="paceEasy">–</div></div>
+      <div class="pace-cell"><div class="pl">レースペース</div><div class="pv" id="paceMP">–</div></div>
+      <div class="pace-cell"><div class="pl">テンポ走</div><div class="pv" id="paceTempo">–</div></div>
+      <div class="pace-cell"><div class="pl">インターバル</div><div class="pv" id="paceInterval">–</div></div>
+    </div>
+
+    <div class="week-title">
+      <span>今週の練習(<b id="weekRangeLabel">–</b>)</span>
+      <span id="weekDoneCount">0/4</span>
+    </div>
+    <div class="session-list" id="sessionList"></div>
+
+    <details class="plan-table">
+      <summary>全13週間のプランを見る</summary>
+      <div class="plan-table-scroll">
+        <table class="plan">
+          <thead>
+            <tr><th>週</th><th>期間</th><th>フェーズ</th><th>火:イージー</th><th>木:ポイント</th><th>土:つなぎ</th><th>日:ロング</th><th>週間目安</th></tr>
+          </thead>
+          <tbody id="planTableBody"></tbody>
+        </table>
+      </div>
+    </details>
+
+    <div class="note-line">目安のプランです。痛みや強い疲労があれば無理せず1週間そのまま繰り返してOK。禁酒で睡眠の質が上がると回復にも効いてきます。持病や不安がある場合は事前にかかりつけ医に相談してください。</div>
+  </section>
+
+  <footer>しらふ手帳・この記録はこのブラウザだけに保存されます</footer>
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'shirafu-techo-v1';
+  var DAY_MS = 86400000;
+
+  var MILESTONES = [
+    { days: 20/1440, label:'20分', desc:'血圧と心拍が落ち着き始めます。' },
+    { days: 0.5,      label:'12時間', desc:'血中の一酸化炭素濃度が下がり、酸素を運びやすくなります。' },
+    { days: 3,        label:'72時間', desc:'離脱期特有の不快感がやわらぎ始める人が多い時期です(個人差があります)。' },
+    { days: 7,        label:'1週間', desc:'睡眠の質が上がりはじめ、肝臓の炎症が落ち着いてきます。' },
+    { days: 14,       label:'2週間', desc:'血のめぐりが良くなり、体を動かすのが楽に感じられてきます。' },
+    { days: 30,       label:'1ヶ月', desc:'肝機能の数値が改善し、肌の調子も上向きになってきます。' },
+    { days: 90,       label:'3ヶ月', desc:'膵臓の働きが整い、免疫力が高まってきます。' },
+    { days: 365,      label:'1年', desc:'心疾患のリスクが大きく下がります。' }
+  ];
+
+  var AFFIRMATIONS = [
+    '「やめよう」と思えたこと自体が、もう一歩前進です。',
+    '昨日までの自分ではなく、今日の選択を積み重ねていこう。',
+    '完璧じゃなくていい。続けようとする気持ちが一番の力になります。',
+    '飲まなかった今日は、未来の自分への贈り物です。',
+    '迷いながらでも進んでいる自分を、認めてあげてください。',
+    '小さな「やめておく」の積み重ねが、大きな自信になります。',
+    '昨日うまくいかなくても、今日はまた選び直せます。',
+    '数字よりも、続けようとしている姿勢を大切に。',
+    '誰かと比べなくていい。自分のペースで十分です。',
+    '「やめたい」と思った日を、また一つの再スタート地点に。'
+  ];
+
+  function defaultState(){
+    return {
+      quitStart: '2026-09-07T00:00',
+      dailyAmount: null,
+      journal: [],
+      longestStreakDays: 0
+    };
+  }
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return defaultState();
+      var parsed = JSON.parse(raw);
+      var d = defaultState();
+      return Object.assign(d, parsed);
+    }catch(e){
+      return defaultState();
+    }
+  }
+
+  function saveState(state){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){ /* storage unavailable: continue without persistence */ }
+  }
+
+  var state = loadState();
+
+  var el = {
+    greeting: document.getElementById('greeting'),
+    todayLine: document.getElementById('todayLine'),
+    hero: document.getElementById('hero'),
+    heroLabel: document.getElementById('heroLabel'),
+    heroNumber: document.getElementById('heroNumber'),
+    heroSub: document.getElementById('heroSub'),
+    heroBest: document.getElementById('heroBest'),
+    toggleEdit: document.getElementById('toggleEdit'),
+    editPanel: document.getElementById('editPanel'),
+    quitStartInput: document.getElementById('quitStartInput'),
+    saveStart: document.getElementById('saveStart'),
+    toggleReset: document.getElementById('toggleReset'),
+    confirmBox: document.getElementById('confirmBox'),
+    cancelReset: document.getElementById('cancelReset'),
+    confirmReset: document.getElementById('confirmReset'),
+    savedValue: document.getElementById('savedValue'),
+    savedNote: document.getElementById('savedNote'),
+    dailyAmount: document.getElementById('dailyAmount'),
+    milestoneValue: document.getElementById('milestoneValue'),
+    milestoneNote: document.getElementById('milestoneNote'),
+    milestoneBar: document.getElementById('milestoneBar'),
+    benefitList: document.getElementById('benefitList'),
+    affirmationText: document.getElementById('affirmationText'),
+    journalInput: document.getElementById('journalInput'),
+    saveJournal: document.getElementById('saveJournal'),
+    journalList: document.getElementById('journalList')
+  };
+
+  // ---- 湘南国際マラソン(12/7)・サブ4プラン ----
+  (function(){
+    var M_STORAGE_KEY = 'shirafu-techo-marathon-v1';
+    var RACE_DATE = new Date('2026-12-07T09:00');
+    var DAY_MS = 86400000;
+
+    // 4日/週(火:イージー, 木:ポイント練習, 土:つなぎジョグ, 日:ロング走)
+    // 週の始まりは月曜日。week13は11/30(月)始まり、日曜の翌日(12/7 月)がレース当日。
+    var PLAN = [
+      { start:'2026-09-07', phase:'土台構築', easy:'6km・会話できるペース', quality:'ビルドアップ 5km(後半だけ少し上げる)', bridge:'5km・のんびり', long:'12km', total:'約28km' },
+      { start:'2026-09-14', phase:'土台構築', easy:'6km', quality:'閾値走 6km(うちテンポ3km)', bridge:'5km', long:'14km', total:'約31km' },
+      { start:'2026-09-21', phase:'土台構築', easy:'7km', quality:'インターバル 1000m×4(つなぎ400mジョグ)', bridge:'6km', long:'16km', total:'約37km' },
+      { start:'2026-09-28', phase:'回復週', easy:'6km・楽に', quality:'テンポ走 5km', bridge:'5km', long:'14km・楽に', total:'約30km' },
+      { start:'2026-10-05', phase:'走り込み', easy:'8km', quality:'インターバル 1000m×5', bridge:'6km', long:'20km', total:'約42km' },
+      { start:'2026-10-12', phase:'走り込み', easy:'8km', quality:'閾値走 8km(うち6km)', bridge:'6km', long:'22km(後半5kmはレースペース)', total:'約44km' },
+      { start:'2026-10-19', phase:'走り込み', easy:'8km', quality:'インターバル 1200m×5', bridge:'7km', long:'24km', total:'約47km' },
+      { start:'2026-10-26', phase:'回復週', easy:'6km・楽に', quality:'テンポ走 5km', bridge:'5km', long:'16km・楽に', total:'約32km' },
+      { start:'2026-11-02', phase:'走り込み(ピーク)', easy:'8km', quality:'閾値走 9km(うち7km)', bridge:'6km', long:'28km(後半10kmはレースペース)', total:'約48km' },
+      { start:'2026-11-09', phase:'走り込み(ピーク)', easy:'8km', quality:'インターバル 1000m×6', bridge:'6km', long:'32km(今回の最長距離)', total:'約54km' },
+      { start:'2026-11-16', phase:'テーパー開始', easy:'6km', quality:'テンポ走 6km(レースペース刺激)', bridge:'5km', long:'20km(うちレースペース10km)', total:'約37km' },
+      { start:'2026-11-23', phase:'テーパー', easy:'5km', quality:'ペース走 4km(レースペースのみ)', bridge:'4km', long:'12km(うちレースペース5km)', total:'約25km' },
+      { start:'2026-11-30', phase:'レース週', easy:'4km・楽に', quality:'ジョグ+流し3本', bridge:'20分ジョグ', long:'完全休養・翌月曜レース本番', total:'仕上げ' }
+    ];
+
+    function pad(n){ return String(n).padStart(2,'0'); }
+    function fmtMD(d){ return (d.getMonth()+1)+'/'+d.getDate(); }
+    function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+
+    function parseTimeToSec(str){
+      if(!str) return null;
+      var parts = str.split(':').map(function(s){ return parseInt(s,10); });
+      if(parts.some(isNaN)) return null;
+      if(parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+      if(parts.length === 2) return parts[0]*60 + parts[1];
+      return null;
+    }
+    function secToPace(sec){
+      sec = Math.round(sec);
+      var m = Math.floor(sec/60), s = sec%60;
+      return m + ':' + pad(s);
+    }
+
+    var mEl = {
+      countdown: document.getElementById('raceCountdown'),
+      phaseBadge: document.getElementById('phaseBadge'),
+      goalInput: document.getElementById('goalTimeInput'),
+      goalNote: document.getElementById('goalPaceNote'),
+      paceEasy: document.getElementById('paceEasy'),
+      paceMP: document.getElementById('paceMP'),
+      paceTempo: document.getElementById('paceTempo'),
+      paceInterval: document.getElementById('paceInterval'),
+      weekRangeLabel: document.getElementById('weekRangeLabel'),
+      weekDoneCount: document.getElementById('weekDoneCount'),
+      sessionList: document.getElementById('sessionList'),
+      planTableBody: document.getElementById('planTableBody')
+    };
+
+    function loadM(){
+      try{
+        var raw = localStorage.getItem(M_STORAGE_KEY);
+        var d = { goalTime:'3:55:00', completed:{} };
+        if(!raw) return d;
+        return Object.assign(d, JSON.parse(raw));
+      }catch(e){ return { goalTime:'3:55:00', completed:{} }; }
+    }
+    function saveM(m){
+      try{ localStorage.setItem(M_STORAGE_KEY, JSON.stringify(m)); }catch(e){}
+    }
+
+    var mState = loadM();
+    mEl.goalInput.value = mState.goalTime;
+
+    function findWeekIndex(now){
+      for(var i=PLAN.length-1;i>=0;i--){
+        if(now >= new Date(PLAN[i].start+'T00:00')) return i;
+      }
+      return -1;
+    }
+
+    function renderPaces(){
+      var goalSec = parseTimeToSec(mEl.goalInput.value) || parseTimeToSec('3:55:00');
+      var mpSecPerKm = goalSec / 42.195;
+      mEl.paceMP.textContent = secToPace(mpSecPerKm) + '/km';
+      mEl.paceEasy.textContent = secToPace(mpSecPerKm+75) + '〜' + secToPace(mpSecPerKm+45) + '/km';
+      mEl.paceTempo.textContent = secToPace(mpSecPerKm-20) + '/km';
+      mEl.paceInterval.textContent = secToPace(mpSecPerKm-50) + '/km';
+      var underFour = goalSec <= 4*3600;
+      mEl.goalNote.textContent = 'ゴール平均 ' + secToPace(mpSecPerKm) + '/km' + (underFour ? '(サブ4ペース)' : '');
+    }
+
+    function renderCountdown(){
+      var now = new Date();
+      var diffDays = Math.ceil((RACE_DATE - now)/DAY_MS);
+      if(diffDays > 0){
+        mEl.countdown.innerHTML = diffDays + '<small>日後にレース</small>';
+      } else if(diffDays === 0){
+        mEl.countdown.innerHTML = '本日<small>レース当日!</small>';
+      } else {
+        mEl.countdown.innerHTML = '完走<small>お疲れ様でした</small>';
+      }
+    }
+
+    function renderWeek(){
+      var now = new Date();
+      var idx = findWeekIndex(now);
+      var wk = idx >= 0 ? PLAN[idx] : PLAN[0];
+      var displayIdx = idx >= 0 ? idx : 0;
+      var start = new Date(wk.start+'T00:00');
+      var end = addDays(start, wk === PLAN[PLAN.length-1] ? 7 : 6);
+
+      if(idx < 0){
+        mEl.phaseBadge.textContent = '開始前';
+      } else if(idx === PLAN.length-1){
+        mEl.phaseBadge.textContent = wk.phase;
+      } else {
+        mEl.phaseBadge.textContent = 'Week ' + (idx+1) + '・' + wk.phase;
+      }
+      mEl.weekRangeLabel.textContent = fmtMD(start) + '〜' + fmtMD(end);
+
+      var sessions = [
+        { key:'easy', day:'火', type:'イージーラン', detail:wk.easy },
+        { key:'quality', day:'木', type:'ポイント練習', detail:wk.quality },
+        { key:'bridge', day:'土', type:'つなぎジョグ', detail:wk.bridge },
+        { key:'long', day:'日', type:'ロング走', detail:wk.long }
+      ];
+      var doneMap = mState.completed[displayIdx] || {};
+      mEl.sessionList.innerHTML = '';
+      var doneCount = 0;
+      sessions.forEach(function(s){
+        var isDone = !!doneMap[s.key];
+        if(isDone) doneCount++;
+        var row = document.createElement('label');
+        row.className = 'session-row' + (isDone ? ' done' : '');
+        row.innerHTML = '<input type="checkbox" '+(isDone?'checked':'')+'>' +
+          '<span class="session-day">'+s.day+'</span>' +
+          '<span class="session-body"><span class="session-type">'+s.type+'</span>' +
+          '<div class="session-detail">'+s.detail+'</div></span>';
+        row.querySelector('input').addEventListener('change', function(e){
+          if(!mState.completed[displayIdx]) mState.completed[displayIdx] = {};
+          mState.completed[displayIdx][s.key] = e.target.checked;
+          saveM(mState);
+          renderWeek();
+        });
+        mEl.sessionList.appendChild(row);
+      });
+      mEl.weekDoneCount.textContent = doneCount + '/4';
+    }
+
+    function renderPlanTable(){
+      var now = new Date();
+      var idx = findWeekIndex(now);
+      mEl.planTableBody.innerHTML = '';
+      PLAN.forEach(function(wk, i){
+        var start = new Date(wk.start+'T00:00');
+        var end = addDays(start, i === PLAN.length-1 ? 7 : 6);
+        var tr = document.createElement('tr');
+        if(i === idx) tr.className = 'current-week';
+        tr.innerHTML =
+          '<td class="wk">'+(i+1)+'</td>' +
+          '<td>'+fmtMD(start)+'〜'+fmtMD(end)+'</td>' +
+          '<td><span class="tag-phase">'+wk.phase+'</span></td>' +
+          '<td>'+wk.easy+'</td>' +
+          '<td>'+wk.quality+'</td>' +
+          '<td>'+wk.bridge+'</td>' +
+          '<td>'+wk.long+'</td>' +
+          '<td>'+wk.total+'</td>';
+        mEl.planTableBody.appendChild(tr);
+      });
+    }
+
+    function renderMarathon(){
+      renderCountdown();
+      renderPaces();
+      renderWeek();
+    }
+
+    mEl.goalInput.addEventListener('change', function(){
+      mState.goalTime = mEl.goalInput.value;
+      saveM(mState);
+      renderPaces();
+    });
+
+    renderMarathon();
+    renderPlanTable();
+    setInterval(renderCountdown, 60000);
+  })();
+
+  function greetingText(){
+    var h = new Date().getHours();
+    if(h >= 5 && h < 11) return 'おはようございます、ひらきさん';
+    if(h >= 11 && h < 18) return 'こんにちは、ひらきさん';
+    return 'こんばんは、ひらきさん';
+  }
+
+  function fmtDate(d){
+    return d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+  }
+
+  function toDatetimeLocalValue(iso){
+    var d = new Date(iso);
+    function pad(n){ return String(n).padStart(2,'0'); }
+    return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+  }
+
+  function findMilestones(elapsedDays){
+    var achieved = null, next = null;
+    for(var i=0;i<MILESTONES.length;i++){
+      if(MILESTONES[i].days <= elapsedDays){ achieved = MILESTONES[i]; }
+      else { next = MILESTONES[i]; break; }
+    }
+    return { achieved: achieved, next: next };
+  }
+
+  function render(){
+    el.greeting.textContent = greetingText();
+    el.todayLine.textContent = fmtDate(new Date()) + ' の記録';
+
+    var now = new Date();
+    var start = new Date(state.quitStart);
+    var diffMs = now - start;
+
+    if(diffMs < 0){
+      // quit date is in the future
+      el.hero.classList.add('hero-countdown');
+      el.heroLabel.textContent = '禁酒スタートまで';
+      var untilMs = -diffMs;
+      var uH = Math.floor(untilMs/3600000);
+      var uM = Math.floor((untilMs%3600000)/60000);
+      el.heroNumber.innerHTML = uH + '<small>時間' + uM + '分</small>';
+      el.heroSub.textContent = fmtDate(start) + ' から記録が始まります';
+      el.heroBest.hidden = true;
+
+      el.savedValue.textContent = '¥0';
+      el.savedNote.textContent = '禁酒がはじまると自動で計算されます';
+      el.milestoneValue.textContent = MILESTONES[0].label;
+      el.milestoneNote.textContent = 'スタート後、最初の変化が訪れる目安です';
+      el.milestoneBar.style.width = '0%';
+      renderBenefits({ achieved: null, next: null });
+      el.affirmationText.textContent = 'はじめる前のこの時間も、もう準備の一部です。';
+    } else {
+      el.hero.classList.remove('hero-countdown');
+      el.heroLabel.textContent = '禁酒をはじめてから';
+      var elapsedDays = diffMs / DAY_MS;
+      var wholeDays = Math.floor(elapsedDays);
+      var remMs = diffMs - wholeDays*DAY_MS;
+      var hh = Math.floor(remMs/3600000);
+      var mm = Math.floor((remMs%3600000)/60000);
+      el.heroNumber.innerHTML = wholeDays + '<small>日</small>';
+      el.heroSub.textContent = '+ ' + hh + '時間' + mm + '分・開始: ' + fmtDate(start);
+
+      if(state.longestStreakDays > 0){
+        el.heroBest.hidden = false;
+        el.heroBest.textContent = '自己ベスト: ' + Math.floor(state.longestStreakDays) + '日';
+      } else {
+        el.heroBest.hidden = true;
+      }
+
+      // savings
+      if(state.dailyAmount && state.dailyAmount > 0){
+        var saved = Math.round(elapsedDays * state.dailyAmount);
+        el.savedValue.textContent = '¥' + saved.toLocaleString('ja-JP');
+        el.savedNote.textContent = '';
+      } else {
+        el.savedValue.textContent = '¥0';
+        el.savedNote.textContent = '1日の金額を入れると自動で計算されます';
+      }
+
+      // milestones
+      var m = findMilestones(elapsedDays);
+      renderBenefits(m, elapsedDays);
+      if(m.next){
+        var remainDays = m.next.days - elapsedDays;
+        var label, prevDays = m.achieved ? m.achieved.days : 0;
+        if(remainDays < 1){
+          var remainH = Math.ceil(remainDays*24);
+          label = 'あと約' + remainH + '時間';
+        } else {
+          label = 'あと約' + Math.ceil(remainDays) + '日';
+        }
+        el.milestoneValue.textContent = m.next.label;
+        el.milestoneNote.textContent = label + 'で「' + m.next.label + '」の節目です';
+        var span = m.next.days - prevDays;
+        var pct = span > 0 ? Math.min(100, Math.max(0, ((elapsedDays-prevDays)/span)*100)) : 100;
+        el.milestoneBar.style.width = pct + '%';
+      } else {
+        el.milestoneValue.textContent = '達成済み';
+        el.milestoneNote.textContent = 'すべての節目を超えました。よくここまで。';
+        el.milestoneBar.style.width = '100%';
+      }
+
+      el.affirmationText.textContent = AFFIRMATIONS[wholeDays % AFFIRMATIONS.length];
+    }
+
+    if(!state.dailyAmount){
+      el.savedValue.textContent = '¥0';
+    }
+  }
+
+  function renderBenefits(m, elapsedDays){
+    el.benefitList.innerHTML = '';
+    var rows = [];
+    if(m.achieved){
+      rows.push({ tag:'到達', cls:'achieved', label:m.achieved.label, desc:m.achieved.desc });
+      if(m.next){
+        rows.push({ tag:'次', cls:'next', label:m.next.label, desc:m.next.desc });
+      }
+    } else {
+      rows.push({ tag:'これから', cls:'next', label:MILESTONES[0].label, desc:MILESTONES[0].desc });
+    }
+    rows.forEach(function(r){
+      var div = document.createElement('div');
+      div.className = 'benefit-row';
+      div.innerHTML = '<span class="benefit-tag '+r.cls+'">'+r.tag+'</span>' +
+        '<span class="benefit-text"><b>'+r.label+'</b> — '+r.desc+'</span>';
+      el.benefitList.appendChild(div);
+    });
+  }
+
+  function renderJournal(){
+    el.journalList.innerHTML = '';
+    if(!state.journal || state.journal.length === 0){
+      var empty = document.createElement('div');
+      empty.className = 'journal-empty';
+      empty.textContent = 'まだ記録がありません。今日感じたことを書いてみましょう。';
+      el.journalList.appendChild(empty);
+      return;
+    }
+    var items = state.journal.slice().sort(function(a,b){ return b.ts - a.ts; });
+    items.forEach(function(entry){
+      var d = new Date(entry.ts);
+      var row = document.createElement('div');
+      row.className = 'journal-item';
+      var meta = document.createElement('div');
+      meta.className = 'meta';
+      meta.textContent = (d.getMonth()+1)+'/'+d.getDate()+'\n'+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+      meta.style.whiteSpace = 'pre-line';
+      var text = document.createElement('div');
+      text.className = 'text';
+      text.textContent = entry.text;
+      var del = document.createElement('button');
+      del.setAttribute('aria-label','この記録を削除');
+      del.textContent = '×';
+      del.addEventListener('click', function(){
+        state.journal = state.journal.filter(function(j){ return j.id !== entry.id; });
+        saveState(state);
+        renderJournal();
+      });
+      row.appendChild(meta);
+      row.appendChild(text);
+      row.appendChild(del);
+      el.journalList.appendChild(row);
+    });
+  }
+
+  // init inputs from state
+  if(state.dailyAmount){ el.dailyAmount.value = state.dailyAmount; }
+  el.dailyAmount.addEventListener('change', function(){
+    var v = parseFloat(el.dailyAmount.value);
+    state.dailyAmount = (!isNaN(v) && v >= 0) ? v : null;
+    saveState(state);
+    render();
+  });
+
+  el.toggleEdit.addEventListener('click', function(){
+    var hidden = el.editPanel.hidden;
+    el.editPanel.hidden = !hidden;
+    if(hidden){ el.quitStartInput.value = toDatetimeLocalValue(state.quitStart); }
+  });
+  el.saveStart.addEventListener('click', function(){
+    if(el.quitStartInput.value){
+      state.quitStart = el.quitStartInput.value;
+      saveState(state);
+      el.editPanel.hidden = true;
+      render();
+    }
+  });
+
+  el.toggleReset.addEventListener('click', function(){
+    el.confirmBox.hidden = !el.confirmBox.hidden;
+  });
+  el.cancelReset.addEventListener('click', function(){
+    el.confirmBox.hidden = true;
+  });
+  el.confirmReset.addEventListener('click', function(){
+    var now = new Date();
+    var elapsedDays = Math.max(0,(now - new Date(state.quitStart))/DAY_MS);
+    state.longestStreakDays = Math.max(state.longestStreakDays||0, elapsedDays);
+    function pad(n){ return String(n).padStart(2,'0'); }
+    state.quitStart = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'T'+pad(now.getHours())+':'+pad(now.getMinutes());
+    saveState(state);
+    el.confirmBox.hidden = true;
+    render();
+  });
+
+  el.saveJournal.addEventListener('click', function(){
+    var text = el.journalInput.value.trim();
+    if(!text) return;
+    state.journal = state.journal || [];
+    state.journal.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), ts: Date.now(), text: text });
+    saveState(state);
+    el.journalInput.value = '';
+    renderJournal();
+  });
+
+  render();
+  renderJournal();
+  setInterval(render, 60000);
+})();
+</script>
+<script>
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){ /* offline caching unavailable: app still works online */ });
+    });
+  }
+</script>
+</body>
+</html>
