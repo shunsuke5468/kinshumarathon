@@ -309,6 +309,43 @@
     border-radius:99px 0 0 99px;
   }
 
+  .badge-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:12px;
+  }
+  @media (max-width:480px){
+    .badge-grid{ grid-template-columns:repeat(3,1fr); }
+  }
+  .badge{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    text-align:center;
+  }
+  .badge-circle{
+    width:52px; height:52px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:2px solid var(--line);
+    background:var(--surface-2);
+    color:var(--ink-faint);
+  }
+  .badge-circle svg{ width:22px; height:22px; }
+  .badge.done .badge-circle{
+    border-color:var(--amber);
+    background:var(--amber-soft);
+    color:var(--amber);
+  }
+  .badge-label{
+    font-size:11px;
+    color:var(--ink-faint);
+  }
+  .badge.done .badge-label{ color:var(--ink-muted); font-weight:700; }
+
   .card{
     background:var(--surface);
     border:1px solid var(--line);
@@ -674,6 +711,32 @@
     </div>
     <div class="stat">
       <div class="stat-label">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2" stroke-linecap="round"/></svg>
+        浮いた時間
+      </div>
+      <div class="stat-value teal" id="timeValue">–</div>
+      <div class="amount-row">
+        <span class="stat-note">1日あたり</span>
+        <input type="number" id="dailyHours" placeholder="例: 2" min="0" step="0.5" inputmode="decimal">
+        <span class="stat-note">時間で計算</span>
+      </div>
+      <div class="stat-note" id="timeNote"></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">
+        <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.6"><path d="M9 3c0 2-2 3-2 6a5 5 0 0 0 10 0c0-1.5-.7-2.3-1.3-3 0 1.2-.7 1.8-1.2 1.8C15 6 14.5 4.5 12.5 3c.3 1.5-.4 2.3-1 3-.7.8-1.5 1.7-1.5 3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 21h8" stroke-linecap="round"/></svg>
+        摂らなかったカロリー
+      </div>
+      <div class="stat-value teal" id="kcalValue">–</div>
+      <div class="amount-row">
+        <span class="stat-note">1日あたり</span>
+        <input type="number" id="dailyKcal" placeholder="例: 400" min="0" inputmode="numeric">
+        <span class="stat-note">kcalで計算</span>
+      </div>
+      <div class="stat-note" id="kcalNote"></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">
         <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg>
         次のマイルストーン
       </div>
@@ -681,6 +744,11 @@
       <div class="stat-note" id="milestoneNote"></div>
       <div class="progress"><span id="milestoneBar" style="width:0%"></span></div>
     </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="badge-dot" style="background:var(--amber)"></span>達成バッジ</h2>
+    <div class="badge-grid" id="badgeGrid"></div>
   </section>
 
   <section class="card">
@@ -754,14 +822,24 @@
   var DAY_MS = 86400000;
 
   var MILESTONES = [
-    { days: 20/1440, label:'20分', desc:'血圧と心拍が落ち着き始めます。' },
+    { days: 20/1440,  label:'20分', desc:'血圧と心拍が落ち着き始めます。' },
+    { days: 60/1440,  label:'1時間', desc:'アルコールの影響が抜け始め、判断力が戻ってきます。' },
+    { days: 0.25,     label:'6時間', desc:'血糖値が安定し始めます。' },
     { days: 0.5,      label:'12時間', desc:'血中の一酸化炭素濃度が下がり、酸素を運びやすくなります。' },
+    { days: 1,        label:'24時間', desc:'血糖値がほぼ正常に。人によってはこの時期に離脱の不快感が出ることもあります。' },
     { days: 3,        label:'72時間', desc:'離脱期特有の不快感がやわらぎ始める人が多い時期です(個人差があります)。' },
     { days: 7,        label:'1週間', desc:'睡眠の質が上がりはじめ、肝臓の炎症が落ち着いてきます。' },
     { days: 14,       label:'2週間', desc:'血のめぐりが良くなり、体を動かすのが楽に感じられてきます。' },
+    { days: 21,       label:'3週間', desc:'睡眠のサイクルが安定してきます。' },
     { days: 30,       label:'1ヶ月', desc:'肝機能の数値が改善し、肌の調子も上向きになってきます。' },
+    { days: 42,       label:'6週間', desc:'内臓脂肪が減り始めます。' },
+    { days: 60,       label:'2ヶ月', desc:'集中力や記憶力の向上を感じやすくなります。' },
     { days: 90,       label:'3ヶ月', desc:'膵臓の働きが整い、免疫力が高まってきます。' },
-    { days: 365,      label:'1年', desc:'心疾患のリスクが大きく下がります。' }
+    { days: 180,      label:'6ヶ月', desc:'肝臓の機能がさらに回復し、脂肪肝の改善がみられることもあります。' },
+    { days: 270,      label:'9ヶ月', desc:'睡眠の質の改善がすっかり定着してきます。' },
+    { days: 365,      label:'1年', desc:'心疾患のリスクが大きく下がります。' },
+    { days: 548,      label:'1年半', desc:'生活習慣病全般のリスクがさらに低下していきます。' },
+    { days: 730,      label:'2年', desc:'依存に関わるリスクが大幅に下がるとされる時期です。' }
   ];
 
   var AFFIRMATIONS = [
@@ -774,13 +852,38 @@
     '昨日うまくいかなくても、今日はまた選び直せます。',
     '数字よりも、続けようとしている姿勢を大切に。',
     '誰かと比べなくていい。自分のペースで十分です。',
-    '「やめたい」と思った日を、また一つの再スタート地点に。'
+    '「やめたい」と思った日を、また一つの再スタート地点に。',
+    'その一杯を我慢できた自分に、まず気づいてあげよう。',
+    '変わろうとしている今のあなたは、もう十分がんばっています。',
+    '記録すること自体が、自分を大切にする行為です。',
+    '今日の選択が、来月の自分を助けてくれます。',
+    '波がある日があっても、続けている限り前進しています。',
+    '飲まない夜も、意外と悪くないと感じられたら儲けもの。',
+    '走る体力も、しらふの時間から積み上がっていきます。',
+    '誰にも気づかれなくても、自分だけは知っている頑張りです。',
+    '今日という日は、もう二度と後戻りしません。積み重ねを信じて。',
+    '「やめておく」を選べた回数だけ、自分を信頼できるようになります。'
+  ];
+
+  var BADGES = [
+    { days:1,   label:'1日目' },
+    { days:3,   label:'3日' },
+    { days:7,   label:'1週間' },
+    { days:14,  label:'2週間' },
+    { days:30,  label:'1ヶ月' },
+    { days:50,  label:'50日' },
+    { days:90,  label:'3ヶ月' },
+    { days:100, label:'100日' },
+    { days:180, label:'半年' },
+    { days:365, label:'1年' }
   ];
 
   function defaultState(){
     return {
       quitStart: '2026-09-07T00:00',
       dailyAmount: null,
+      dailyHours: null,
+      dailyKcal: null,
       journal: [],
       longestStreakDays: 0
     };
@@ -825,11 +928,18 @@
     savedValue: document.getElementById('savedValue'),
     savedNote: document.getElementById('savedNote'),
     dailyAmount: document.getElementById('dailyAmount'),
+    timeValue: document.getElementById('timeValue'),
+    timeNote: document.getElementById('timeNote'),
+    dailyHours: document.getElementById('dailyHours'),
+    kcalValue: document.getElementById('kcalValue'),
+    kcalNote: document.getElementById('kcalNote'),
+    dailyKcal: document.getElementById('dailyKcal'),
     milestoneValue: document.getElementById('milestoneValue'),
     milestoneNote: document.getElementById('milestoneNote'),
     milestoneBar: document.getElementById('milestoneBar'),
     benefitList: document.getElementById('benefitList'),
     affirmationText: document.getElementById('affirmationText'),
+    badgeGrid: document.getElementById('badgeGrid'),
     journalInput: document.getElementById('journalInput'),
     saveJournal: document.getElementById('saveJournal'),
     journalList: document.getElementById('journalList')
@@ -1069,10 +1179,15 @@
 
       el.savedValue.textContent = '¥0';
       el.savedNote.textContent = '禁酒がはじまると自動で計算されます';
+      el.timeValue.textContent = '0時間';
+      el.timeNote.textContent = '禁酒がはじまると自動で計算されます';
+      el.kcalValue.textContent = '0kcal';
+      el.kcalNote.textContent = '禁酒がはじまると自動で計算されます';
       el.milestoneValue.textContent = MILESTONES[0].label;
       el.milestoneNote.textContent = 'スタート後、最初の変化が訪れる目安です';
       el.milestoneBar.style.width = '0%';
       renderBenefits({ achieved: null, next: null });
+      renderBadges(0);
       el.affirmationText.textContent = 'はじめる前のこの時間も、もう準備の一部です。';
     } else {
       el.hero.classList.remove('hero-countdown');
@@ -1101,6 +1216,36 @@
         el.savedValue.textContent = '¥0';
         el.savedNote.textContent = '1日の金額を入れると自動で計算されます';
       }
+
+      // time saved
+      if(state.dailyHours && state.dailyHours > 0){
+        var totalHours = elapsedDays * state.dailyHours;
+        if(totalHours >= 24){
+          var tDays = Math.floor(totalHours/24);
+          var tRemH = Math.round(totalHours%24);
+          el.timeValue.textContent = Math.round(totalHours) + '時間';
+          el.timeNote.textContent = '約' + tDays + '日と' + tRemH + '時間ぶんの自由時間です';
+        } else {
+          el.timeValue.textContent = Math.round(totalHours*10)/10 + '時間';
+          el.timeNote.textContent = '';
+        }
+      } else {
+        el.timeValue.textContent = '0時間';
+        el.timeNote.textContent = '1日の時間を入れると自動で計算されます';
+      }
+
+      // calories not consumed
+      if(state.dailyKcal && state.dailyKcal > 0){
+        var totalKcal = Math.round(elapsedDays * state.dailyKcal);
+        el.kcalValue.textContent = totalKcal.toLocaleString('ja-JP') + 'kcal';
+        var runKm = totalKcal / 60;
+        el.kcalNote.textContent = runKm >= 1 ? 'ジョギング約' + Math.round(runKm) + 'kmぶんの消費カロリーに相当(目安)' : '';
+      } else {
+        el.kcalValue.textContent = '0kcal';
+        el.kcalNote.textContent = '1日のカロリーを入れると自動で計算されます';
+      }
+
+      renderBadges(elapsedDays);
 
       // milestones
       var m = findMilestones(elapsedDays);
@@ -1153,6 +1298,22 @@
     });
   }
 
+  function renderBadges(elapsedDays){
+    el.badgeGrid.innerHTML = '';
+    BADGES.forEach(function(b){
+      var done = elapsedDays >= b.days;
+      var div = document.createElement('div');
+      div.className = 'badge' + (done ? ' done' : '');
+      div.innerHTML = '<span class="badge-circle">' +
+        (done
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/></svg>'
+        ) + '</span>' +
+        '<span class="badge-label">'+b.label+'</span>';
+      el.badgeGrid.appendChild(div);
+    });
+  }
+
   function renderJournal(){
     el.journalList.innerHTML = '';
     if(!state.journal || state.journal.length === 0){
@@ -1194,6 +1355,22 @@
   el.dailyAmount.addEventListener('change', function(){
     var v = parseFloat(el.dailyAmount.value);
     state.dailyAmount = (!isNaN(v) && v >= 0) ? v : null;
+    saveState(state);
+    render();
+  });
+
+  if(state.dailyHours){ el.dailyHours.value = state.dailyHours; }
+  el.dailyHours.addEventListener('change', function(){
+    var v = parseFloat(el.dailyHours.value);
+    state.dailyHours = (!isNaN(v) && v >= 0) ? v : null;
+    saveState(state);
+    render();
+  });
+
+  if(state.dailyKcal){ el.dailyKcal.value = state.dailyKcal; }
+  el.dailyKcal.addEventListener('change', function(){
+    var v = parseFloat(el.dailyKcal.value);
+    state.dailyKcal = (!isNaN(v) && v >= 0) ? v : null;
     saveState(state);
     render();
   });

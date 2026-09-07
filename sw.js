@@ -1,6 +1,6 @@
 // しらふ手帳 - オフラインでも開けるようにするための簡易キャッシュ
 // ファイルを更新したら CACHE_VERSION の数字を上げてください(古いキャッシュを破棄して新しい内容に更新されます)
-var CACHE_VERSION = 'shirafu-techo-v2';
+var CACHE_VERSION = 'shirafu-techo-v3';
 var APP_SHELL = [
   './index.html',
   './manifest.json',
